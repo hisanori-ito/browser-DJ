@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+    <title>Browser DJ</title>
+    <link rel="stylesheet" href="style.css">
+  </head>
+  <body>
+
+    <div class="DJkit">
+
+      <!-- チャンネル -->
+      <div class="channels">
+
+        <!-- 左チャンネル Q ~ T -->
+        <div class="leftChannel">
+          <div data-key="81" class="key">
+            <kbd>Q</kbd>
+            <span id="Q"></span>
+          </div>
+          <div data-key="87" class="key">
+            <kbd>W</kbd>
+            <span id="W"></span>
+          </div>
+          <div data-key="69" class="key">
+            <kbd>E</kbd>
+            <span id="E"></span>
+          </div>
+          <div data-key="82" class="key">
+            <kbd>R</kbd>
+            <span id="R"></span>
+          </div>
+          <div data-key="84" class="key">
+            <kbd>T</kbd>
+            <span id="T"></span>
+          </div>
+        </div>
+        
+        <audio class="song" data-key="81" loop src="songs/left/Left 1.mp3"></audio>
+        <audio class="song" data-key="87" loop src="songs/left/Left 2.mp3"></audio>
+        <audio class="song" data-key="69" loop src="songs/left/Left 3.mp3"></audio>
+        <audio class="song" data-key="82" loop src="songs/left/Left 4.mp3"></audio>
+        <audio class="song" data-key="84" loop src="songs/left/Left 5.mp3"></audio>
+
+        <!-- 右チャンネル Y ~ P -->
+        <div class="rightChannel">
+          <div data-key="89" class="key">
+            <kbd>Y</kbd>
+            <span id="Y"></span>
+          </div>
+          <div data-key="85" class="key">
+            <kbd>U</kbd>
+            <span id="U"></span>
+          </div>
+          <div data-key="73" class="key">
+            <kbd>I</kbd>
+            <span id="I"></span>
+          </div>
+          <div data-key="79" class="key">
+            <kbd>O</kbd>
+            <span id="O"></span>
+          </div>
+          <div data-key="80" class="key">
+            <kbd>P</kbd>
+            <span id="P"></span>
+          </div>
+        </div>
+
+        <audio class="song" data-key="89" loop src="songs/right/Right 1.mp3"></audio>
+        <audio class="song" data-key="85" loop src="songs/right/Right 2.mp3"></audio>
+        <audio class="song" data-key="73" loop src="songs/right/Right 3.mp3"></audio>
+        <audio class="song" data-key="79" loop src="songs/right/Right 4.mp3"></audio>
+        <audio class="song" data-key="80" loop src="songs/right/Right 5.mp3"></audio>
+      </div>
+
+      <div class="discriotion">
+        <div class="leftDiscription">
+          <div>
+            <span id="lPlaying">Loading...</span>
+          </div>
+        </div>
+        <div class="rightDiscription">
+          <div>
+            <span id="rPlaying">Loading...</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="buttons">
+
+        <!-- 左チャンネル F -->
+        <div class="leftPress">
+          <div data-key="70" class="key">
+            <span id="lStatus">wait to start</span>
+            <kbd>F</kbd>
+            <span class="next">next song is</span>
+            <span id="lSelected">Loading...</span>
+            <audio id="lNeedle" data-key="70"></audio>
+          </div>
+        </div>
+        
+        <!-- ボリューム調節 -->
+        <div class="volumeBar">
+          <input type="range" value="50" id="volume">
+        </div>
+
+        <!-- 右チャンネル J -->
+        <div class="rightPress">
+          <div data-key="74" class="key">
+            <span id="rStatus">wait to start</span>
+            <kbd>J</kbd>
+            <span class="next">next song is</span>
+            <span id="rSelected">Loading...</span>
+            <audio id="rNeedle" data-key="74"></audio>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- JSによる処理 -->
+    <script>
+
+      // 操作対象の曲を格納するための変数
+      let lNeedle = document.getElementById('lNeedle');
+      let rNeedle = document.getElementById('rNeedle');
+
+      // 曲を保持するための変数
+      let lSongHolder;
+      let rSongHolder;
+
+      // 曲の再生停止の時に使うフラグ
+      let lFlg = false;
+      let rFlg = false;
+
+      // 音量の初期設定(音量バーを動かさずにスタートした場合のため、スライダーの中心の位置の値で初期化しておく)
+      let lVolume = 0.5;
+      let rVolume = 0.5;
+
+      // ==================================================================
+      // 曲名表示機能
+      // ==================================================================
+      function showSongName() {
+
+        // クラス名が'song'のタグから情報を取得
+        let songs = document.querySelectorAll('.song');
+
+        // 取得した曲数に応じて処理を行う
+        for(let i = 0; i < songs.length; i++) {
+          
+          // 曲のファイルパスから曲名を取得
+          let songName = songs[i].src.split(/[/ .]/).reverse()[1].replace(/%20/g," ");
+          
+          // キーに応じて処理を分ける
+          switch(songs[i].dataset.key) {
+
+            // 左チャンネルの曲名表示
+            case '81':
+              let QSongName = document.getElementById('Q');
+              QSongName.innerText = songName;
+              break;
+            case '87':
+              let WSongName = document.getElementById('W');
+              WSongName.innerText = songName;
+              break;
+            case '69':
+              let ESongName = document.getElementById('E');
+              ESongName.innerText = songName;
+              break;
+            case '82':
+              let RSongName = document.getElementById('R');
+              RSongName.innerText = songName;
+              break;
+            case '84':
+              let TSongName = document.getElementById('T');
+              TSongName.innerText = songName;
+              break;
+
+            // 右チャンネルの曲名表示
+            case '89':
+              let YSongName = document.getElementById('Y');
+              YSongName.innerText = songName;
+              break;
+            case '85':
+              let USongName = document.getElementById('U');
+              USongName.innerText = songName;
+              break;
+            case '73':
+              let ISongName = document.getElementById('I');
+              ISongName.innerText = songName;
+              break;
+            case '79':
+              let OSongName = document.getElementById('O');
+              OSongName.innerText = songName;
+              break;
+            case '80':
+              let PSongName = document.getElementById('P');
+              PSongName.innerText = songName;
+              break;
+            default:
+          }
+        }
+      }
+
+      // ==================================================================
+      // 曲のセット機能
+      // Q~T, Y~Pの任意のキーが押されたらsongHolderにaudioセット
+      // ==================================================================
+      function setSongHolder(e) {
+
+        let song;
+        let lSelected = document.getElementById('lSelected');
+        let rSelected = document.getElementById('rSelected');
+        
+        if(e.keyCode == 69 || e.keyCode == 81 || e.keyCode == 82 || e.keyCode == 84 || e.keyCode == 87) {
+
+          // 左チャンネルの処理
+
+          song = document.querySelector(`audio[data-key="${e.keyCode}"]`);
+
+          if(song == null) {
+            alert("曲がありません");
+            return;
+          }
+
+          lSongHolder = song;
+          lSelected.innerText = lSongHolder.src.split(/[/ .]/).reverse()[1].replace(/%20/g," ");
+        } else if(e.keyCode == 73 || e.keyCode == 79 || e.keyCode == 80 || e.keyCode == 85 || e.keyCode == 89) {
+
+          // 右チャンネルの処理
+         
+          song = document.querySelector(`audio[data-key="${e.keyCode}"]`);
+
+          if(song == null) {
+            alert("曲がありません");
+            return;
+          }
+
+          rSongHolder = song;
+          rSelected.innerText = rSongHolder.src.split(/[/ .]/).reverse()[1].replace(/%20/g," ");
+        } else {
+          // Q, W, E, R, T, Y, U, I, O, P以外のキー（曲が紐づいていないキー）が押されたら何もしない
+          return;
+        }
+      }
+
+      // ============================================
+      // 曲の再生・停止機能
+      // ============================================
+      function dropNeedle(e) {
+
+        if(e.keyCode == 70) {
+
+          // 左チャンネルの処理
+
+          let lStatus = document.getElementById('lStatus');
+          let lPlaying = document.getElementById('lPlaying');
+          
+          if(lFlg) {
+
+            lNeedle.pause();
+            lStatus.innerText = "now stopped";
+            
+            lFlg = false;
+          } else {
+
+            if(lNeedle != lSongHolder) {
+              
+              lNeedle = lSongHolder;
+
+              if(lNeedle) {
+                let lSongName = lNeedle.src.split(/[/ .]/).reverse()[1].replace(/%20/g," ");
+                lPlaying.innerText = lSongName;
+              }
+            }
+
+            if(lNeedle == null) {
+              alert('曲をセットしてください');
+              return;
+            }
+
+            lNeedle.volume = lVolume;
+            lNeedle.play();
+            lStatus.innerText = "now playing";
+
+            lFlg = true;
+          }
+        } else if (e.keyCode == 74) {
+
+          // 右チャンネルの処理
+
+          let rStatus = document.getElementById('rStatus');
+          let lPlaying = document.getElementById('rPlaying');
+          
+          if(rFlg) {
+            
+            rNeedle.pause();
+            rStatus.innerText = "now stopped";
+
+            rFlg = false;
+          } else {
+            
+            if(rNeedle != rSongHolder) {
+             
+              rNeedle = rSongHolder;
+
+              if(rNeedle) {
+                let rSongName = rNeedle.src.split(/[/ .]/).reverse()[1].replace(/%20/g," ");
+                rPlaying.innerText = rSongName;
+              }
+            }
+
+            if(rNeedle == null) {
+              alert('曲をセットしてください');
+              return;
+            }
+            
+            rNeedle.volume = rVolume;
+            rNeedle.play();
+            rStatus.innerText = "now playing";
+
+            rFlg = true;
+          }
+        } else {
+
+          // F, J以外のキーが押されたら何もしない
+          return;
+        }
+      }
+
+      // =======================
+      // 音量調節機能
+      // =======================
+      function changeVolume() {
+      
+        let volume = document.getElementById('volume');
+
+        lVolume = (100 - volume.value) / 100;
+        rVolume = volume.value / 100;
+        
+        lNeedle.volume = lVolume;
+        rNeedle.volume = rVolume;
+      }
+
+      // ==============================
+      // cssの変化
+      // ==============================
+      function removeTransition(e) {
+        if (e.propertyName !== 'transform') return;
+        e.target.classList.remove('playing');
+      }
+
+      function changeCSS(e) {
+        const key = document.querySelector(`div[data-key="${e.keyCode}"]`);
+        if (!key) return;
+
+        key.classList.add('playing');
+      }
+
+      const keys = Array.from(document.querySelectorAll('.key'));
+      keys.forEach(key => key.addEventListener('transitionend', removeTransition))
+
+      // 画面が読み込まれた時に実行される
+      window.addEventListener('load', showSongName);
+
+      // キーボードが押された時に実行される
+      window.addEventListener('keydown', changeCSS);
+      window.addEventListener('keydown', setSongHolder);
+      window.addEventListener('keydown', dropNeedle);
+
+      // スライダーが動いた時に実行される
+      volume.addEventListener('input', changeVolume);
+    </script>
+  </body>
+</html>

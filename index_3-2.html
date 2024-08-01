@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+    <title>Browser DJ</title>
+    <link rel="stylesheet" href="style.css">
+  </head>
+  <body>
+
+    <div class="DJkit">
+
+      <!-- チャンネル -->
+      <div class="channels">
+
+        <!-- 左チャンネル Q ~ T -->
+        <div class="leftChannel">
+          <div data-key="81" class="key">
+            <kbd>Q</kbd>
+            <span id="Q"></span>
+          </div>
+          <div data-key="87" class="key">
+            <kbd>W</kbd>
+            <span id="W"></span>
+          </div>
+          <div data-key="69" class="key">
+            <kbd>E</kbd>
+            <span id="E"></span>
+          </div>
+          <div data-key="82" class="key">
+            <kbd>R</kbd>
+            <span id="R"></span>
+          </div>
+          <div data-key="84" class="key">
+            <kbd>T</kbd>
+            <span id="T"></span>
+          </div>
+        </div>
+        
+        <audio class="song" data-key="81" loop src="songs/left/Left 1.mp3"></audio>
+        <audio class="song" data-key="87" loop src="songs/left/Left 2.mp3"></audio>
+        <audio class="song" data-key="69" loop src="songs/left/Left 3.mp3"></audio>
+        <audio class="song" data-key="82" loop src="songs/left/Left 4.mp3"></audio>
+        <audio class="song" data-key="84" loop src="songs/left/Left 5.mp3"></audio>
+
+        <!-- 右チャンネル Y ~ P -->
+        <div class="rightChannel">
+          <div data-key="89" class="key">
+            <kbd>Y</kbd>
+            <span id="Y"></span>
+          </div>
+          <div data-key="85" class="key">
+            <kbd>U</kbd>
+            <span id="U"></span>
+          </div>
+          <div data-key="73" class="key">
+            <kbd>I</kbd>
+            <span id="I"></span>
+          </div>
+          <div data-key="79" class="key">
+            <kbd>O</kbd>
+            <span id="O"></span>
+          </div>
+          <div data-key="80" class="key">
+            <kbd>P</kbd>
+            <span id="P"></span>
+          </div>
+        </div>
+
+        <audio class="song" data-key="89" loop src="songs/right/Right 1.mp3"></audio>
+        <audio class="song" data-key="85" loop src="songs/right/Right 2.mp3"></audio>
+        <audio class="song" data-key="73" loop src="songs/right/Right 3.mp3"></audio>
+        <audio class="song" data-key="79" loop src="songs/right/Right 4.mp3"></audio>
+        <audio class="song" data-key="80" loop src="songs/right/Right 5.mp3"></audio>
+      </div>
+
+      <div class="discriotion">
+        <div class="leftDiscription">
+          <div>
+            <span id="lPlaying">Loading...</span>
+          </div>
+        </div>
+        <div class="rightDiscription">
+          <div>
+            <span id="rPlaying">Loading...</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="buttons">
+
+        <!-- 左チャンネル F -->
+        <div class="leftPress">
+          <div data-key="70" class="key">
+            <span id="lStatus">wait to start</span>
+            <kbd>F</kbd>
+            <span class="next">next song is</span>
+            <span id="lSelected">Loading...</span>
+            <audio id="lNeedle" data-key="70"></audio>
+          </div>
+        </div>
+        
+        <!-- ボリューム調節 -->
+        <div class="volumeBar">
+          <input type="range" value="50" id="volume">
+        </div>
+
+        <!-- 右チャンネル J -->
+        <div class="rightPress">
+          <div data-key="74" class="key">
+            <span id="rStatus">wait to start</span>
+            <kbd>J</kbd>
+            <span class="next">next song is</span>
+            <span id="rSelected">Loading...</span>
+            <audio id="rNeedle" data-key="74"></audio>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- JSによる処理 -->
+    <script>
+
+      // ==================================================================
+      // 曲名表示機能
+      // ==================================================================
+      function showSongName() {
+
+        // クラス名が'song'のタグから情報を取得
+        let songs = document.querySelectorAll('.song');
+
+        // 取得した曲数に応じて処理を行う
+        for(let i = 0; i < songs.length; i++) {
+          
+          // 曲のファイルパスから曲名を取得
+          let songName = songs[i].src.split(/[/ .]/).reverse()[1].replace(/%20/g," ");
+          
+          // キーに応じて処理を分ける
+          switch(songs[i].dataset.key) {
+
+            // 左チャンネルの曲名表示
+            case '81':
+              let QSongName = document.getElementById('Q');
+              QSongName.innerText = songName;
+              break;
+            case '87':
+              let WSongName = document.getElementById('W');
+              WSongName.innerText = songName;
+              break;
+            case '69':
+              let ESongName = document.getElementById('E');
+              ESongName.innerText = songName;
+              break;
+            case '82':
+              let RSongName = document.getElementById('R');
+              RSongName.innerText = songName;
+              break;
+            case '84':
+              let TSongName = document.getElementById('T');
+              TSongName.innerText = songName;
+              break;
+
+            // 右チャンネルの曲名表示
+            case '89':
+              let YSongName = document.getElementById('Y');
+              YSongName.innerText = songName;
+              break;
+            case '85':
+              let USongName = document.getElementById('U');
+              USongName.innerText = songName;
+              break;
+            case '73':
+              let ISongName = document.getElementById('I');
+              ISongName.innerText = songName;
+              break;
+            case '79':
+              let OSongName = document.getElementById('O');
+              OSongName.innerText = songName;
+              break;
+            case '80':
+              let PSongName = document.getElementById('P');
+              PSongName.innerText = songName;
+              break;
+            default:
+          }
+        }
+      }
+
+      // ==============================
+      // cssの変化
+      // ==============================
+      function removeTransition(e) {
+        if (e.propertyName !== 'transform') return;
+        e.target.classList.remove('playing');
+      }
+
+      function changeCSS(e) {
+        const key = document.querySelector(`div[data-key="${e.keyCode}"]`);
+        if (!key) return;
+
+        key.classList.add('playing');
+      }
+
+      const keys = Array.from(document.querySelectorAll('.key'));
+      keys.forEach(key => key.addEventListener('transitionend', removeTransition))
+
+      // 画面が読み込まれた時に実行される
+      window.addEventListener('load', showSongName);
+
+      // キーボードが押された時に実行される
+      window.addEventListener('keydown', changeCSS);
+    </script>
+  </body>
+</html>
